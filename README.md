@@ -39,3 +39,14 @@ The only hard requirement is running on a Mac (for Homebrew). To add support for
 ```
 ./bootstrap.sh
 ```
+
+# Project configuration
+
+The `project-configuration.json` file contains the project config, and looks like the following:
+```
+{
+	"repos": []
+}
+```
+
+`repos` contains all the git repos that we are tracking.
