@@ -1,3 +1,10 @@
 {
-	"repos": []
+  "repos": [
+    "/Users/paulvasiu/dev/repos/cli-helpers",
+    "/Users/paulvasiu/dev",
+    "/Users/paulvasiu/dev/repos/bootstrap-dev-environment",
+    "/Users/paulvasiu/dev/repos/services/code-generator",
+    "/Users/paulvasiu/dev/repos/services/documentation-generator",
+    "/Users/paulvasiu/dev/repos/templates/project/node.typescript.base"
+  ]
 }
