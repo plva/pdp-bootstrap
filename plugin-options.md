@@ -1,0 +1,166 @@
+# oh-my-zsh
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/1password
+	- use the command opswd to copy passwords for services into your clipboard
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/ag
+	- completion support for ag
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/aliases
+	- show aliases by group
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/alias-finder
+	- find aliases
+-  https://github.com/phacility/arcanist
+	- cli tool for phabricator
+- https://github.com/wting/autojump
+	- autojump to directories you use most often
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/autojump
+- https://github.com/hyperupcall/autoenv
+	- per project shell environments
+	- execute `.env` file when entering a directory
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/autoenv
+	- alternatively, https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/dotenv
+- https://github.com/julienXX/terminal-notifier
+	- notifications from terminal
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/bgnotify
+- https://bun.sh/
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/bun
+	- all-in-one JavaScript runtime & toolkit designed for speed, complete with a bundler, test runner, and Node.js-compatible package manager.
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/catimg
+	- display images on the terminal
+- https://docs.celeryq.dev/en/stable/
+	- task queue with focus on real-time processing, while also supporting task scheduling
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/celery
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/colored-man-pages
+	- colors to man pages
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/command-not-found
+	- provide suggested packages to be installed if a command cannot be found
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/common-aliases
+	- many common aliases
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/emoji
+	- emojis in global variables
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/emoji-clock
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/extract
+	- extract/unarchive facade
+- https://github.com/clvv/fasd
+	- quick access to files by frequency and recency
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/fancy-ctrl-z
+	- ctrl-z back to vim
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git-prompt
+	- prompt for current git repo
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/history
+	- history aliases
+	- add to them
+- https://httpie.io/cli
+	- testing and debugging of APIs, HTTP servers, and web services
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/httpie
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/isodate
+	- date aliases
+- https://github.com/mooz/percol
+	- interactive grep tool
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/percol
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/per-directory-history
+	- per-directory history
+- https://pm2.keymetrics.io/docs/usage/quick-start/
+	- daemon process manager for nodejs
+- https://pre-commit.com/
+	- pre-commit hooks
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/pre-commit
+- https://github.com/BurntSushi/ripgrep
+	- recursive grep
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/ripgrep
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/urltools
+	- urlencode and decode
+## later
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/ant
+	- completion for ant
+- https://starship.rs/
+	- cross-shell prompt
+- https://github.com/asdf-vm/asdf
+	- manage multiple runtime versions per-project
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/asdf
+- https://argoproj.github.io/cd/
+	- GitOps continuous delivery tool for Kubernetes
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/argocd
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/helm
+- https://github.com/mbrubeck/compleat
+	- generate tab completion for any shell command
+	- https://github.com/mbrubeck/compleat
+- https://github.com/sharkdp/fd
+	- find entries in filesystem
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/fd
+- https://fig.io/
+	- collaborative command line
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/fig
+- https://cli.github.com/
+	- github cli
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/gh
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/history-substring-search
+	- more complicated history search
+- https://istio.io/
+	- platform-independent service mesh that provides traffic management, policy enforcement, and telemetry collection.
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/istioctl
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/iterm2
+	- iterm2 integration
+  
+## not that useful
+- https://github.com/ajeetdsouza/zoxide
+	- faster directory jumping
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/brew
+	- brew aliases
+- https://docs.cloudfoundry.org/concepts/overview.html
+	- cloud platform
+- - https://github.com/charmbracelet/charm
+	- cloud backend to your terminal-based applications
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/charm
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/dircycle
+	- cycle through directories
+	- need to rebind to `ctrl+[`
+- https://fluxcd.io/
+	- continuous and progressive delivery solutions for Kubernetes
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/fluxcd
+	- https://github.com/kubernetes/kops
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/kops
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/kubectl
+	- https://kubernetes.io/docs/reference/kubectl/kubectl/
+	- https://github.com/kubernetes/minikubekj
+		- local Kubernetes application development
+		- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/minikube
+- https://docs.lando.dev/getting-started/
+	- abstraction layer and superset of Docker Compose
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/lando
+- https://github.com/Schniz/fnm
+	- node version manager
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/fnm
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git-auto-fetch
+	- Automatically fetches all changes from all remotes while you are working in a git-initialized directory
+- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/golang
+	- go aliases  
+# other
+- https://github.com/ggreer/the_silver_searcher
+	- code search tool
+
+- https://bazel.build/
+	- build and test your multi-language, multi-platform projects
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/bazel
+## deprioritize
+- https://www.phacility.com/
+	- Phabricator is a set of tools for developing software. It includes applications for code review, repository hosting, bug tracking, project management, and more.
+- https://ant.apache.org/
+	- build java applications
+- https://docs.docker.com/compose/
+	- defining and running multi-container Docker applications
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/docker-compose/
+# review later
+- https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+- https://github.com/nvie/gitflow
+	- https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git-flow  
+
+# todo later
+- create `pbcopy`/`pbpaste` aliases/helper functions
+- https://sheerun.net/2014/03/21/how-to-boost-your-vim-productivity/
+- alias suggestion (find aliases) for commonly used commands
+	- analyze history
+
+
+# nvim plugins
+- nvim tree
+- tree sitter for syntax highlighting
+- read about telescope
