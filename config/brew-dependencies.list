@@ -10,3 +10,4 @@ docker
 helm
 kubectl
 links
+openssh
