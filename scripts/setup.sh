@@ -1,6 +1,8 @@
 #!/bin/zsh
 zparseopts -E -D -- \
-           -install-without-asking=INSTALL_WITHOUT_ASKING
+           -install-without-asking=INSTALL_WITHOUT_ASKING \
+           -force-update-all=FORCE_UPDATE_ALL
+
 
 # Check if not running on macOS
 if [[ "$OSTYPE" != darwin* ]]; then
@@ -10,10 +12,24 @@ fi
 
 NOT_INSTALLED=121
 IS_INSTALLED=0
-
 is_installed() {
     local formula=$1
     if ! command -v "${formula}" >/dev/null 2>&1; then
+        return ${NOT_INSTALLED}
+    else
+        return ${IS_INSTALLED}
+    fi
+}
+
+is_installed_with_brew() {
+    local formula=$1
+    local cache_file="/tmp/memoize_brew_install.cache"
+
+    if [ ! -e "${cache_file}" ]; then
+        brew list > "${cache_file}"
+    fi
+
+    if ! cat "${cache_file}" | grep "${formula}" >/dev/null 2>&1; then
         return ${NOT_INSTALLED}
     else
         return ${IS_INSTALLED}
@@ -57,7 +73,7 @@ fi
 
 check_and_brew_install() {
     local formula=$1
-    if is_installed "${formula}"; then
+    if is_installed_with_brew "${formula}" || is_installed "${formula}"; then
         echo "${formula} is installed."
     else
         echo "${formula} is not installed."
@@ -87,7 +103,6 @@ ask_for_install () {
 }
 
 
-
 brew_install () {
    local formula=$1
    
@@ -103,14 +118,60 @@ brew_install () {
 while read package
 do
     check_and_brew_install "${package}"
-
 done < "../config/brew-dependencies.list"
 
 setup_custom_hosts() {
-    echo "Adding custom hosts file. First backing up /etc/hosts"
+    if [[ -n "${FORCE_UPDATE_ALL}" ]]; then
+        echo "Adding custom hosts file. First backing up /etc/hosts"
+    else
+        echo "Skipping hosts file install, use '--force-update-all' flag if needed."
+        return 0
+    fi
     sudo mv /etc/hosts /etc/hosts.bak
     sudo cat ../hosts/default.hosts | sudo tee /etc/hosts
     sudo cat ../hosts/custom.hosts | sudo tee -a /etc/hosts
 }
 
+upgrade_pip() {
+    if [[ -n "${FORCE_UPDATE_ALL}" ]]; then
+        echo "Upgrading pip"
+    else
+        echo "Skipping pip upgrade, to force use '--force-update-all' flag if needed."
+        return 0
+    fi
+    python3 -m pip install --upgrade pip
+}
+
+upgrade_pip
+setup_tmux_conf() {
+    echo "we are in $(pwd)"
+    echo "Backing up ~/.tmux.conf"
+    cp ~/.tmux.conf ~/.tmux.conf.bak
+    echo "Copying config/.tmux.conf to ~/.tmux.conf"
+    cp ../config/tmux.conf ~/.tmux.conf
+}
+
+setup_tmux_conf
 setup_custom_hosts
+
+setup_tpm() {
+    local TPM_DIR="~/.tmux/plugins/tpm"
+    if [[ -d "${TPM_DIR}" ]]; then
+        echo "tpm already installed."
+        return 0
+    else
+        echo "no tpm dir"
+    fi
+
+    echo "Setting up tmux package manager (tpm)."
+    echo "creating '${TPM_DIR}'"
+#    git clone https://github.com/tmux-plugins/tpm "${TPM_DIR}"
+}
+
+setup_tpm
+
+# using pip3
+setup_gita() {
+    pip3 install -U gita
+}
+setup_gita

@@ -9,5 +9,6 @@
 - https://github.com/glacambre/firenvim
 	- nvim in the browser for text areas
 
-
-  
+# local urls and web terminal
+- need a tui (textui) that can preview links on the right hand size of screen (maybe in a diff tmux window/pane)
+- want to be able to edit commands on the left, and see them run on the right
