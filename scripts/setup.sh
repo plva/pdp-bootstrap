@@ -175,3 +175,16 @@ setup_gita() {
     pip3 install -U gita
 }
 setup_gita
+
+setup_tmuxinator_completions() {
+    local TMUXINATOR_FUNCTIONS_DIR="/usr/local/share/zsh/site-functions"
+    if [[ -n "${FORCE_UPDATE_ALL}" ]]; then
+        echo "setting up tmuxinator completions in ${TMUXINATOR_FUNCTIONS_DIR}"
+    else
+        echo "Skipping tmuxinator completions upgrade, to force use '--force-update-all' flag if needed."
+        return 0
+    fi
+    sudo mkdir -p "${TMUXINATOR_FUNCTIONS_DIR}"
+    sudo wget https://raw.githubusercontent.com/tmuxinator/tmuxinator/master/completion/tmuxinator.zsh -O "${TMUXINATOR_FUNCTIONS_DIR}/_tmuxinator"
+}
+setup_tmuxinator_completions
