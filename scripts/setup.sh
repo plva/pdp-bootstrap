@@ -29,7 +29,7 @@ is_installed_with_brew() {
         brew list > "${cache_file}"
     fi
 
-    if ! cat "${cache_file}" | grep "${formula}" >/dev/null 2>&1; then
+    if ! cat "${cache_file}" | grep -E "^${formula}$">/dev/null 2>&1; then
         return ${NOT_INSTALLED}
     else
         return ${IS_INSTALLED}
@@ -83,6 +83,7 @@ check_and_brew_install() {
 
 ask_for_install () {
     local formula=$1
+    local package_manager=$2
     
     if [[ -n "${INSTALL_WITHOUT_ASKING}" ]]; then
         echo "Installing ${formula} without asking."
@@ -91,7 +92,7 @@ ask_for_install () {
         echo "what?"
     fi
 
-    echo "Install ${formula} using Homebrew?"
+    echo "Install ${formula} using ${package_manager}?"
 
     read -q user_confirm
     echo
@@ -106,7 +107,7 @@ ask_for_install () {
 brew_install () {
    local formula=$1
    
-   if ask_for_install "${formula}"; then
+   if ask_for_install "${formula}" "homebrew"; then
        echo "Installing ${formula} using Homebrew..."
        brew install "${formula}" 
    else
@@ -119,6 +120,48 @@ while read package
 do
     check_and_brew_install "${package}"
 done < "../config/brew-dependencies.list"
+
+npm_global_install() {
+    local package=$1
+
+    if ask_for_install "${package}" "npm"; then
+        echo "Installing ${package} globally using npm..."
+        npm install -g "${package}"
+    else
+        echo "Installation of ${package} using npm aborted by user."
+        exit 1
+    fi
+}
+
+check_and_npm_global_install() {
+    local package=$1
+
+    if npm list -g "${package}" >/dev/null 2>&1; then
+        echo "${package} is already globally installed."
+    else
+        echo "${package} is not globally installed."
+        npm_global_install "${package}"
+    fi
+}
+
+install_global_npm_packages() {
+    while read package
+    do
+        check_and_npm_global_install "${package}"
+    done < "../config/npm-global-dependencies.list"
+}
+
+install_global_npm_packages
+
+check_for_zoxide() {
+    if ! is_installed zoxide; then
+        echo "zoxide is not installed, skipping init"
+    # else
+    #     echo "running zoxide init"
+    #     eval "$(zoxide init zsh)"
+    fi
+}
+check_for_zoxide
 
 setup_custom_hosts() {
     if [[ -n "${FORCE_UPDATE_ALL}" ]]; then
@@ -188,3 +231,14 @@ setup_tmuxinator_completions() {
     sudo wget https://raw.githubusercontent.com/tmuxinator/tmuxinator/master/completion/tmuxinator.zsh -O "${TMUXINATOR_FUNCTIONS_DIR}/_tmuxinator"
 }
 setup_tmuxinator_completions
+
+
+check_and_install_zsh_autocomplete() {
+    if [[ -d ~/repos/zsh-autocomplete ]]; then
+        echo "zsh-autocomplete is already installed"
+    else
+        echo "setting up zsh-autocomplete"
+        git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git ~/repos
+    fi
+}
+check_and_install_zsh_autocomplete
