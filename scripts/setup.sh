@@ -185,6 +185,7 @@ upgrade_pip() {
     python3 -m pip install --upgrade pip
 }
 
+
 upgrade_pip
 setup_tmux_conf() {
     echo "we are in $(pwd)"
@@ -194,7 +195,7 @@ setup_tmux_conf() {
     cp ../config/tmux.conf ~/.tmux.conf
 }
 
-setup_tmux_conf
+satup_tmux_conf
 setup_custom_hosts
 
 setup_tpm() {
@@ -214,10 +215,13 @@ setup_tpm() {
 setup_tpm
 
 # using pip3
-setup_gita() {
+setup_pip_dependencies() {
     pip3 install -U gita
+    # this fails for some reason
+    # pip3 install --upgrade lookatme
+    pip install mitmproxy
 }
-setup_gita
+setup_pip_dependencies
 
 setup_tmuxinator_completions() {
     local TMUXINATOR_FUNCTIONS_DIR="/usr/local/share/zsh/site-functions"
@@ -242,3 +246,4 @@ check_and_install_zsh_autocomplete() {
     fi
 }
 check_and_install_zsh_autocomplete
+

@@ -23,3 +23,7 @@ tmuxinator
 wget
 zoxide
 nnn
+nushell
+jq
+ack
+jc
