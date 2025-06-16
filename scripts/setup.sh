@@ -1,13 +1,57 @@
 #!/bin/zsh
+
+# Setup logging
+LOG_DIR="$HOME/.pdp/logs"
+LOG_FILE="$LOG_DIR/setup-$(date +%Y%m%d-%H%M%S).log"
+mkdir -p "$LOG_DIR"
+
+log() {
+    local level=$1
+    local message=$2
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] [$level] $message" | tee -a "$LOG_FILE"
+}
+
+error() {
+    log "ERROR" "$1"
+    exit 1
+}
+
+info() {
+    log "INFO" "$1"
+}
+
+# Function to run commands with error handling and output logging
+run_with_error_handling() {
+    local cmd="$1"
+    local description="$2"
+    
+    log "INFO" "Running: $description"
+    log "INFO" "Command: $cmd"
+    
+    # Run the command and capture both stdout and stderr
+    local output
+    if ! output=$(eval "$cmd" 2>&1); then
+        log "ERROR" "Failed: $description"
+        log "ERROR" "Command output: $output"
+        exit 1
+    fi
+    
+    # Log the command output if it's not empty
+    if [ -n "$output" ]; then
+        log "INFO" "Command output: $output"
+    fi
+}
+
 zparseopts -E -D -- \
            -install-without-asking=INSTALL_WITHOUT_ASKING \
            -force-update-all=FORCE_UPDATE_ALL
 
+info "Starting setup script"
 
 # Check if not running on macOS
 if [[ "$OSTYPE" != darwin* ]]; then
-    echo "Not running on macOS. This script is intended only for macOS."
-    exit 1
+    error "Not running on macOS. This script is intended only for macOS."
 fi
 
 NOT_INSTALLED=121
@@ -36,48 +80,60 @@ is_installed_with_brew() {
     fi
 }
 
-echo "Checking for Homebrew"
+info "Checking for Homebrew"
 # Check if Homebrew is not installed
 if ! is_installed brew; then
-    echo "Homebrew is not installed. Installing Homebrew."
+    info "Homebrew is not installed. Installing Homebrew."
     read -q user_confirm
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-     echo >> /Users/paul/.zprofile
-    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/paul/.zprofile
+    run_with_error_handling \
+        '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"' \
+        "Failed to install Homebrew"
+    
+    run_with_error_handling \
+        'echo >> /Users/paul/.zprofile && echo "eval \"$(/opt/homebrew/bin/brew shellenv)\"" >> /Users/paul/.zprofile' \
+        "Failed to update .zprofile with Homebrew path"
+    
     eval "$(/opt/homebrew/bin/brew shellenv)"
+    info "Homebrew installed successfully"
 fi
 
 if ! is_installed nvim; then
-    echo "nvim (neovim) is not installed. Install it using Homebrew? (y/n)"
+    info "nvim (neovim) is not installed. Install it using Homebrew? (y/n)"
 
     read -q user_confirm
     echo
     if [[ $user_confirm =~ ^[Yy]$ ]]; then
-        echo "Installing nvim using Homebrew..."
-        brew install nvim 
-	"Installed nvim. Adding kickstart.nvim"
-        git clone https://github.com/nvim-lua/kickstart.nvim.git "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim
+        info "Installing nvim using Homebrew..."
+        run_with_error_handling \
+            'brew install nvim' \
+            "Failed to install nvim"
+        
+        info "Installed nvim. Adding kickstart.nvim"
+        run_with_error_handling \
+            'git clone https://github.com/nvim-lua/kickstart.nvim.git "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim' \
+            "Failed to clone kickstart.nvim"
     else
-        echo "Installation of nvim aborted by user."
-        exit 1
+        error "Installation of nvim aborted by user."
     fi
 else
-    echo "nvim already installed"
+    info "nvim already installed"
 fi
 
 if [ -d "$HOME/.oh-my-zsh" ]; then
-  echo "Oh My Zsh is installed."
+    info "Oh My Zsh is installed."
 else
-  echo "Oh My Zsh is not installed. Installing from githubusercontent.com/ohmyzsh."
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    info "Oh My Zsh is not installed. Installing from githubusercontent.com/ohmyzsh."
+    run_with_error_handling \
+        'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended' \
+        "Failed to install Oh My Zsh"
 fi
 
 check_and_brew_install() {
     local formula=$1
     if is_installed_with_brew "${formula}" || is_installed "${formula}"; then
-        echo "${formula} is installed."
+        info "${formula} is installed."
     else
-        echo "${formula} is not installed."
+        info "${formula} is not installed."
         brew_install "${formula}"
     fi 
 }
@@ -87,7 +143,7 @@ ask_for_install () {
     local package_manager=$2
     
     if [[ -n "${INSTALL_WITHOUT_ASKING}" ]]; then
-        echo "Installing ${formula} without asking."
+        info "Installing ${formula} without asking."
         return 0
     fi
 
@@ -102,19 +158,20 @@ ask_for_install () {
     fi
 }
 
-
 brew_install () {
    local formula=$1
    
    if ask_for_install "${formula}" "homebrew"; then
-       echo "Installing ${formula} using Homebrew..."
-       brew install "${formula}" 
+       info "Installing ${formula} using Homebrew..."
+       run_with_error_handling \
+           "brew install ${formula}" \
+           "Failed to install ${formula} using Homebrew"
    else
-       echo "Installation of ${formula} using Homebrew aborted by user."
-       exit 1
+       error "Installation of ${formula} using Homebrew aborted by user."
    fi
 }
 
+info "Installing Homebrew dependencies"
 while read package
 do
     check_and_brew_install "${package}"
@@ -192,30 +249,30 @@ upgrade_pip() {
 
 upgrade_pip
 setup_tmux_conf() {
+    info "Setting up tmux configuration"
     echo "we are in $(pwd)"
     if [ -f ~/.tmux.conf ]; then
-        echo "Backing up ~/.tmux.conf"
-        cp ~/.tmux.conf ~/.tmux.conf.bak
+        info "Backing up ~/.tmux.conf"
+        run_with_error_handling \
+            'cp ~/.tmux.conf ~/.tmux.conf.bak' \
+            "Failed to backup ~/.tmux.conf"
     fi
-    echo "Copying config/.tmux.conf to ~/.tmux.conf"
-    cp ../config/tmux.conf ~/.tmux.conf
+    info "Copying config/.tmux.conf to ~/.tmux.conf"
+    run_with_error_handling \
+        'cp ../config/tmux.conf ~/.tmux.conf' \
+        "Failed to copy tmux configuration"
 }
 
 setup_tmux_conf
 setup_custom_hosts
 
 setup_tpm() {
-    local TPM_DIR="~/.tmux/plugins/tpm"
-    if [[ -d "${TPM_DIR}" ]]; then
-        echo "tpm already installed."
-        return 0
+    if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+        log "INFO" "Setting up tmux package manager (tpm)."
+        run_with_error_handling "git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm" "install tmux package manager"
     else
-        echo "no tpm dir"
+        log "INFO" "tmux package manager (tpm) is already installed."
     fi
-
-    echo "Setting up tmux package manager (tpm)."
-    echo "creating '${TPM_DIR}'"
-#    git clone https://github.com/tmux-plugins/tpm "${TPM_DIR}"
 }
 
 setup_tpm
@@ -224,12 +281,19 @@ setup_tpm
 setup_pip_dependencies() {
     # Ensure pipx is installed
     if ! is_installed pipx; then
-        echo "pipx is not installed. Installing pipx via Homebrew..."
-        brew install pipx
+        info "pipx is not installed. Installing pipx via Homebrew..."
+        run_with_error_handling \
+            'brew install pipx' \
+            "Failed to install pipx"
     fi
-    pipx install gita
-    pipx install mitmproxy
-    pipx ensurepath
+    
+    log "INFO" "Installing Python CLI tools via pipx"
+    run_with_error_handling "pipx install gita" "install gita"
+    run_with_error_handling "pipx install mitmproxy" "install mitmproxy"
+    
+    run_with_error_handling \
+        'pipx ensurepath' \
+        "Failed to ensure pipx PATH"
 }
 setup_pip_dependencies
 
@@ -249,12 +313,15 @@ setup_tmuxinator_completions
 
 check_and_install_zsh_autocomplete() {
     if [[ -d ~/repos/zsh-autocomplete ]]; then
-        echo "zsh-autocomplete is already installed"
+        info "zsh-autocomplete is already installed"
     else
-        echo "setting up zsh-autocomplete"
-        mkdir -p ~/repos
-        git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git ~/repos/zsh-autocomplete
+        info "setting up zsh-autocomplete"
+        run_with_error_handling \
+            'mkdir -p ~/repos && git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git ~/repos/zsh-autocomplete' \
+            "Failed to install zsh-autocomplete"
     fi
 }
 check_and_install_zsh_autocomplete
+
+info "Setup completed successfully"
 
