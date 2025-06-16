@@ -5,18 +5,33 @@ LOG_DIR="$HOME/.pdp/logs"
 LOG_FILE="$LOG_DIR/setup-$(date +%Y%m%d-%H%M%S).log"
 mkdir -p "$LOG_DIR"
 
+# Define colors for log levels
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# Function to log messages with timestamps and levels
 log() {
     local level=$1
     local message=$2
+    local color=$NC
+    if [ "$level" = "INFO" ]; then
+        color=$GREEN
+    elif [ "$level" = "ERROR" ]; then
+        color=$RED
+    fi
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    echo "[$timestamp] [$level] $message" | tee -a "$LOG_FILE"
+    local log_entry="[$timestamp] [${color}$level${NC}] $message"
+    echo -e "$log_entry" | tee -a "$LOG_FILE"
 }
 
+# Function to log error messages and exit
 error() {
     log "ERROR" "$1"
     exit 1
 }
 
+# Function to log informational messages
 info() {
     log "INFO" "$1"
 }
@@ -324,4 +339,9 @@ check_and_install_zsh_autocomplete() {
 check_and_install_zsh_autocomplete
 
 info "Setup completed successfully"
+
+# Inform the user where logs are stored
+log "INFO" "Setup logs are stored at $LOG_FILE"
+
+echo "Setup completed successfully. Logs are stored at $LOG_FILE"
 
