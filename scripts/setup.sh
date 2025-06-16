@@ -41,8 +41,9 @@ echo "Checking for Homebrew"
 if ! is_installed brew; then
     echo "Homebrew is not installed. Installing Homebrew."
     read -q user_confirm
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-    (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/paulvasiu/.zprofile
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+     echo >> /Users/paul/.zprofile
+    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/paul/.zprofile
     eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
@@ -88,8 +89,6 @@ ask_for_install () {
     if [[ -n "${INSTALL_WITHOUT_ASKING}" ]]; then
         echo "Installing ${formula} without asking."
         return 0
-    else
-        echo "what?"
     fi
 
     echo "Install ${formula} using ${package_manager}?"
@@ -145,6 +144,12 @@ check_and_npm_global_install() {
 }
 
 install_global_npm_packages() {
+    # First ensure Node.js is installed
+    if ! is_installed node; then
+        echo "Node.js is required for npm packages but is not installed. Installing Node.js..."
+        brew install node
+    fi
+
     while read package
     do
         check_and_npm_global_install "${package}"
@@ -178,24 +183,25 @@ setup_custom_hosts() {
 upgrade_pip() {
     if [[ -n "${FORCE_UPDATE_ALL}" ]]; then
         echo "Upgrading pip"
+        python3 -m pip install --upgrade pip --user
     else
         echo "Skipping pip upgrade, to force use '--force-update-all' flag if needed."
         return 0
     fi
-    python3 -m pip install --upgrade pip
 }
-
 
 upgrade_pip
 setup_tmux_conf() {
     echo "we are in $(pwd)"
-    echo "Backing up ~/.tmux.conf"
-    cp ~/.tmux.conf ~/.tmux.conf.bak
+    if [ -f ~/.tmux.conf ]; then
+        echo "Backing up ~/.tmux.conf"
+        cp ~/.tmux.conf ~/.tmux.conf.bak
+    fi
     echo "Copying config/.tmux.conf to ~/.tmux.conf"
     cp ../config/tmux.conf ~/.tmux.conf
 }
 
-satup_tmux_conf
+setup_tmux_conf
 setup_custom_hosts
 
 setup_tpm() {
@@ -216,10 +222,14 @@ setup_tpm
 
 # using pip3
 setup_pip_dependencies() {
-    pip3 install -U gita
-    # this fails for some reason
-    # pip3 install --upgrade lookatme
-    pip install mitmproxy
+    # Ensure pipx is installed
+    if ! is_installed pipx; then
+        echo "pipx is not installed. Installing pipx via Homebrew..."
+        brew install pipx
+    fi
+    pipx install gita
+    pipx install mitmproxy
+    pipx ensurepath
 }
 setup_pip_dependencies
 
@@ -242,7 +252,8 @@ check_and_install_zsh_autocomplete() {
         echo "zsh-autocomplete is already installed"
     else
         echo "setting up zsh-autocomplete"
-        git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git ~/repos
+        mkdir -p ~/repos
+        git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git ~/repos/zsh-autocomplete
     fi
 }
 check_and_install_zsh_autocomplete
